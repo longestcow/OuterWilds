@@ -1,18 +1,29 @@
 let bodies = [];
-let G = 1;
-let showOrbit = true;
+let G = 0.5;
+let showOrbit = false;
 let stars = [];
+
+//https://www.solarsystemscope.com/textures/
+let starsT, milkywayT, sunT, twin1T, twin2T, earthT;
+function preload(){
+  sunT = loadImage("textures//sun.jpg");
+  twin1T = loadImage("textures//twin1.jpg");
+  twin2T = loadImage("textures//twin2.jpg");
+  earthT = loadImage("textures//earth.jpg");
+  starsT = loadImage("textures//stars.jpg");
+  milkywayT = loadImage("textures//milkyway.jpg");
+}
 
 function setup() {
   createCanvas(800, 800, WEBGL);
 
-  bodies.push(new Body(3200, createVector(0, 0, 0), createVector(0, 0, 0), color(253, 184, 19), 1000, true));
-  bodies.push(new Body(100, createVector(2000, 0, 0), createVector(0, 16, 0), color(0, 0, 255),50));
-  bodies.push(new Body(100, createVector(2200, 0, 0), createVector(0, 9, 0), color(0, 255, 0),50));
+  bodies.push(new Body(6400, createVector(0, 0, 0), createVector(0, 0, 0), sunT, 1000, true));
+  bodies.push(new Body(100, createVector(2000, 0, 0), createVector(0, 16, 0), twin1T, 50));
+  bodies.push(new Body(100, createVector(2200, 0, 0), createVector(0, 9, 0), twin2T, 50));
   camera(0, 0, 6000);
 
   if (showOrbit) {
-    for (let i = 0; i < 10000; i++) {
+    for (let i = 0; i < 5000; i++) {
       for (let body of bodies)
         body.applyGravity();
       for (let body of bodies) {
@@ -26,10 +37,12 @@ function setup() {
       body.vel = body.tvel.copy();
     }
   }
+
+  frameRate(40);
 }
 
 function draw() {
-  background(0, 0, 50);
+  background(0,0,50);
   orbitControl(6, 10, 2);
 
   for (let body of bodies)
@@ -39,11 +52,11 @@ function draw() {
 }
 
 class Body {
-  constructor(mass, pos, vel, col, size = mass, sun = false) {
+  constructor(mass, pos, vel, texture, size = mass, sun = false) {
     this.mass = mass;
     this.pos = pos; this.tpos = pos.copy();
     this.vel = vel; this.tvel = vel.copy();
-    this.col = col;
+    this.texture = texture;
     this.size = size;
     this.orbit = [];
     this.sun = sun;
@@ -67,7 +80,7 @@ class Body {
 
     if (showOrbit && !this.sun) {
       noFill();
-      stroke(this.col);
+      stroke(255);
       strokeWeight(5);
       beginShape();
       for (let p of this.orbit)
@@ -76,10 +89,9 @@ class Body {
     }
 
     push();
-    if (!this.sun) noStroke();
-    else stroke(0);
+    noStroke();
     translate(this.pos.x, this.pos.y, this.pos.z);
-    fill(this.col);
+    texture(this.texture);
     sphere(this.size);
     pop();
   }
