@@ -17,10 +17,12 @@ function preload(){
 function setup() {
   createCanvas(800, 800, WEBGL);
 
-  bodies.push(new Body(6400, createVector(0, 0, 0), createVector(0, 0, 0), sunT, 1000, true));
-  bodies.push(new Body(100, createVector(2000, 0, 0), createVector(0, 16, 0), twin1T, 50));
-  bodies.push(new Body(100, createVector(2200, 0, 0), createVector(0, 9, 0), twin2T, 50));
-  camera(0, 0, 6000);
+  bodies.push(new Body(5000, createVector(0, 0, 0), createVector(0, 0, 0), sunT, color(253, 120, 19), 500, true));
+  bodies.push(new Body(50, createVector(1000, 0, 0), createVector(0, 13, 0), twin1T, color(255,0,0), 35));
+  bodies.push(new Body(50, createVector(1150, 0, 0), createVector(0, 9, 0), twin2T, color(0,0,255), 35));
+  // bodies.push(new Body(50, createVector(1800, 0, 0), createVector(0, 8.15, 0), earthT, color(0,255,0),150));
+  // bodies.push(new Body(1000, createVector(7000, 0, 0), createVector(0, 32,0), earthT, color(255, 192, 203),600));
+  camera(0, 0, 3000);
 
   if (showOrbit) {
     for (let i = 0; i < 5000; i++) {
@@ -38,26 +40,54 @@ function setup() {
     }
   }
 
-  frameRate(40);
+  //stars
+  for(let i = 0; i<1000; i++){
+    let theta = random(180);
+    let phi = random(360);
+    let pos = createVector(
+      4000 * sin(theta) * cos(phi),
+      4000 * cos(theta),
+      4000 * sin(theta) * sin(phi),
+    )
+    stars.push([pos, random(150,250)]);
+  }
+
+  frameRate(30);
+  
 }
 
 function draw() {
   background(0,0,50);
-  orbitControl(6, 10, 2);
-
+  orbitControl(5, 5);
+  ambientLight(50, 50, 50);
+  pointLight(255,250,240,0,0,0);
   for (let body of bodies)
     body.applyGravity();
   for (let body of bodies)
     body.display();
+
+  drawStars();
+
+}
+
+function drawStars(){
+  strokeWeight(2);
+  beginShape(POINTS);
+  for(let star of stars){
+    stroke(star[1]);
+    vertex(star[0].x,star[0].y,star[0].z);
+  }
+  endShape();
 }
 
 class Body {
-  constructor(mass, pos, vel, texture, size = mass, sun = false) {
+  constructor(mass, pos, vel, texture, col, size = mass, sun = false) {
     this.mass = mass;
     this.pos = pos; this.tpos = pos.copy();
     this.vel = vel; this.tvel = vel.copy();
     this.texture = texture;
     this.size = size;
+    this.col = col;
     this.orbit = [];
     this.sun = sun;
   }
@@ -80,18 +110,21 @@ class Body {
 
     if (showOrbit && !this.sun) {
       noFill();
-      stroke(255);
+      stroke(this.col);
       strokeWeight(5);
       beginShape();
       for (let p of this.orbit)
         vertex(p.x, p.y, p.z);
       endShape();
     }
-
     push();
     noStroke();
     translate(this.pos.x, this.pos.y, this.pos.z);
-    texture(this.texture);
+    if(this.sun){
+      emissiveMaterial(this.col);
+      texture(this.texture);}
+    else {emissiveMaterial(0);
+      fill(this.col);}
     sphere(this.size);
     pop();
   }
