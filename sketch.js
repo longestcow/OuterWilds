@@ -20,8 +20,8 @@ function setup() {
   bodies.push(new Body(5000, createVector(0, 0, 0), createVector(0, 0, 0), sunT, color(253, 120, 19), 500, true));
   bodies.push(new Body(50, createVector(1000, 0, 0), createVector(0, 13, 0), twin1T, color(255,0,0), 35));
   bodies.push(new Body(50, createVector(1150, 0, 0), createVector(0, 9, 0), twin2T, color(0,0,255), 35));
-  // bodies.push(new Body(50, createVector(1800, 0, 0), createVector(0, 8.15, 0), earthT, color(0,255,0),150));
-  // bodies.push(new Body(1000, createVector(7000, 0, 0), createVector(0, 32,0), earthT, color(255, 192, 203),600));
+  bodies.push(new Body(50, createVector(2200, 0, 0), createVector(0, 7.7, 0), earthT, color(0,255,0), 150));
+  // bodies.push(new Body(100, createVector(2600, 0, 0), createVector(0, 10,0), earthT, color(255, 192, 203),200));
   camera(0, 0, 3000);
 
   if (showOrbit) {
@@ -45,14 +45,15 @@ function setup() {
     let theta = random(180);
     let phi = random(360);
     let pos = createVector(
-      4000 * sin(theta) * cos(phi),
-      4000 * cos(theta),
-      4000 * sin(theta) * sin(phi),
+      9000 * sin(theta) * cos(phi),
+      9000 * cos(theta),
+      9000 * sin(theta) * sin(phi),
     )
     stars.push([pos, random(150,250)]);
   }
 
-  frameRate(30);
+  frameRate(60);
+  perspective(PI/3.0, width/height, 0.01, 20000);
   
 }
 
@@ -111,7 +112,7 @@ class Body {
     if (showOrbit && !this.sun) {
       noFill();
       stroke(this.col);
-      strokeWeight(5);
+      strokeWeight(1);
       beginShape();
       for (let p of this.orbit)
         vertex(p.x, p.y, p.z);
