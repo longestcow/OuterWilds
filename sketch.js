@@ -1,5 +1,5 @@
 let bodies = [];
-let G = 0.5;
+let G = 1;
 let showOrbit = false;
 let stars = [];
 
@@ -17,15 +17,16 @@ function preload(){
 function setup() {
   createCanvas(800, 800, WEBGL);
 
-  bodies.push(new Body(5000, createVector(0, 0, 0), createVector(0, 0, 0), sunT, color(253, 120, 19), 500, true));
-  bodies.push(new Body(50, createVector(1000, 0, 0), createVector(0, 13, 0), twin1T, color(255,0,0), 35));
-  bodies.push(new Body(50, createVector(1150, 0, 0), createVector(0, 9, 0), twin2T, color(0,0,255), 35));
-  bodies.push(new Body(50, createVector(2200, 0, 0), createVector(0, 7.7, 0), earthT, color(0,255,0), 150));
-  // bodies.push(new Body(100, createVector(2600, 0, 0), createVector(0, 10,0), earthT, color(255, 192, 203),200));
-  camera(0, 0, 3000);
+  bodies.push(new Body(5000, createVector(0, 0, 0), createVector(0, 0, 0), sunT, color(253, 120, 19), 500, true));//sun
+  bodies.push(new Body(50, createVector(1000, 0, 0), createVector(0, 18.5, 0), twin1T, color(255,0,0), 35));//red twin
+  bodies.push(new Body(50, createVector(1150, 0, 0), createVector(0, 12.5, 0), twin2T, color(0,0,255), 35));//blue twin
+  bodies.push(new Body(10, createVector(2100, 0, 0), createVector(0, 5, 0), earthT, color(0,255,0), 150));//green 
+  bodies.push(new Body(10, createVector(3200, 0, 0), createVector(0, 4.1, 0), earthT, color(255, 192, 203),200));//pink
+  bodies.push(new Body(10, createVector(4500, 0, 0), createVector(0, 3.39, 0), earthT, color(0,255,255),400));//cyan
+  camera(0, 0, 6000);
 
   if (showOrbit) {
-    for (let i = 0; i < 5000; i++) {
+    for (let i = 0; i < 20000; i++) {
       for (let body of bodies)
         body.applyGravity();
       for (let body of bodies) {
