@@ -9,5 +9,8 @@ Solar System Simulation
 
 
   the twins  
-![image](https://github.com/longestcow/OuterWilds/assets/83398131/652987db-28f0-427c-8498-3f4dde184374)
+![image](https://github.com/longestcow/OuterWilds/assets/83398131/652987db-28f0-427c-8498-3f4dde184374)   
+really satisfying twin orbit  
+![image](https://github.com/longestcow/OuterWilds/assets/83398131/fe13a2df-1c4a-4152-ad6d-6ab3f6904e0b)
+
 
