@@ -1,5 +1,5 @@
 let bodies = [];
-let G = 1;
+let G = 1; // gravitational constant
 let showOrbit;
 let stars = [];
 let uiOptions = []; 
@@ -12,10 +12,11 @@ function preload(){
 
 function setup() {
   createCanvas(800, 800, WEBGL);
-  makeUi();
 
+  makeUi();
   makePlanets();
-  camera(0, 0, 6000);
+
+  camera(0, 0, 6000); //set camera position so that its easier to look at the orbits
 
   //stars https://mathworld.wolfram.com/SpherePointPicking.html
   for(let i = 0; i<1000; i++){
@@ -39,8 +40,10 @@ function draw() {
     body.applyGravity();
   for (let body of bodies){
     body.display();
-    if(body.sun) pointLight(255,250,240,body.pos.x,body.pos.y,body.pos.z);
+    if(body.sun) pointLight(255,250,240,body.pos.x,body.pos.y,body.pos.z); //emit light in all directions from all bodies which are suns
   }
+  //apply velocity and display are done in seperate loops because the position is updated in display function.
+  //the position is NOT updated right after we get the velocity because other planets might be remaining to calculate their velocities, and thus changing the position of current planet before allowing other planets to use that position will mess stuff up
 
 
   drawStars();
@@ -68,7 +71,7 @@ function makeUi(){
   ];
   let i = 0;
 
-  for(let j of def){
+  for(let j of def){ //loop over all the planets from default values rather than writing out ui for each planet
     let massText = createP("Mass: ");massText.position(820, 1+i*120);
     let mass = createInput(j[0]+"");mass.size(30);mass.position(870,17+i*120);
 
@@ -103,16 +106,17 @@ function makeUi(){
   updateChanges.position(820, 720);
   updateChanges.mouseClicked(makePlanets);
 }
+
 function makePlanets(){
   bodies=[];
-  for(let i of uiOptions){
+  for(let i of uiOptions){ //take all the values from the ui and turn them into body objects
     bodies.push(new Body(
-      float(i[0].value()), 
-      createVector(float(i[1][0].value()), float(i[1][1].value()), float(i[1][2].value())), 
-      createVector(float(i[2][0].value()), float(i[2][1].value()), float(i[2][2].value())), 
-      i[3].color(), 
-      float(i[4].value()), 
-      i[5].checked()
+      float(i[0].value()),  //mass
+      createVector(float(i[1][0].value()), float(i[1][1].value()), float(i[1][2].value())), //pos
+      createVector(float(i[2][0].value()), float(i[2][1].value()), float(i[2][2].value())), //vel
+      i[3].color(), //color
+      float(i[4].value()), //size
+      i[5].checked() //is sun?
     ));
   }
 
@@ -120,7 +124,7 @@ function makePlanets(){
 
 }
 
-function calculateOrbits(){
+function calculateOrbits(){//goes 10k steps into the simulation from start pos, without displaying the planets. takes all the positions at each given step in the 10k steps, and then joins and displays it all in display()
     for (let i = 0; i < 10000; i++) {
       for (let body of bodies)
         body.applyGravity();
@@ -130,7 +134,7 @@ function calculateOrbits(){
           body.orbit.push(body.pos.copy());
       }
     }
-    for (let body of bodies) {
+    for (let body of bodies) {//reset pos and vel after orbit has been calculated
       body.pos = body.tpos.copy();
       body.vel = body.tvel.copy();
     }
@@ -141,8 +145,8 @@ function calculateOrbits(){
 class Body {
   constructor(mass, pos, vel, col, size, sun = false) {
     this.mass = mass;
-    this.pos = pos.copy(); this.tpos = pos.copy();
-    this.vel = vel.copy(); this.tvel = vel.copy();
+    this.pos = pos; this.tpos = pos.copy(); //tpos and tvel used for resetting to original values after orbit positions have been calculated
+    this.vel = vel; this.tvel = vel.copy();
     this.size = size;
     this.col = col;
     this.orbit = [];
@@ -163,9 +167,9 @@ class Body {
   }
 
   display() {
-    this.pos.add(this.vel);//apply velocity
+    this.pos.add(this.vel);//apply velocity to position
 
-    if (showOrbit.checked() && !this.sun) {
+    if (showOrbit.checked() && !this.sun) { 
       noFill();
       stroke(this.col);
       strokeWeight(1);
@@ -178,7 +182,7 @@ class Body {
     push();
     noStroke();
     translate(this.pos.x, this.pos.y, this.pos.z);
-    if(this.sun){
+    if(this.sun){//snu glow and texture
       emissiveMaterial(this.col);
       texture(sunT);
     }
