@@ -1,6 +1,6 @@
 # OuterWilds
-Solar System Simulation  
-Made for CS30 final, inspired by Outer Wilds
+Solar System Simulation   
+Made for CS30 final, inspired by Outer Wilds   
 the solar system
   
 ![image](https://github.com/longestcow/OuterWilds/assets/83398131/6fe1ca2b-444c-40ce-b203-7b7dc144e7a1)
