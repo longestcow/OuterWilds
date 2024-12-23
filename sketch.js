@@ -4,6 +4,9 @@ let showOrbit;
 let stars = [];
 let uiOptions = []; 
 
+let orbitSimStepInput = 10000;
+let orbitPointStepInput = 10;
+
 //https://www.solarsystemscope.com/textures/
 let sunT;
 function preload(){
@@ -28,14 +31,14 @@ function setup() {
       9000 * Math.cos(phi));
     stars.push(pos);
   }
-  perspective(PI/3.0, width/height, 0.01, 20000); //increase clipping max
+  perspective(PI/3.0, width/height, 10, 30000); //increase clipping max (30000 value increases how far the camera can see)
   
 }
 
 function draw() {
   background(0,0,50);
   orbitControl(5, 5);
-  ambientLight(50, 50, 50);
+  ambientLight(40);
   for (let body of bodies)
     body.applyGravity();
   for (let body of bodies){
@@ -61,13 +64,13 @@ function drawStars(){
 }
 
 function makeUi(){
-  let def = [ //default values - mass, issun, pos, velocity, color, size
+  let def = [ //default values - mass, issun, pos, velocity, color, size, orbitSteps
     [6400, true, [0,0,0], [0,0,0], color(253,120,19), 500],
-    [50, false, [1000,0,0], [0,20.3,0], color(255,0,0), 45],
-    [50, false, [1150,0,0], [0,14.3,0], color(0,0,255), 45],
-    [10, false, [2100,0,0], [0,5.55,0], color(0,255,0), 150],
-    [10, false, [3200,0,0], [0,4.48,0], color(255, 192, 203), 200],
-    [10, false, [4500,0,0], [0,3.75,0], color(0,255,255), 400] 
+    [50, false, [1000,0,0], [0,20.2,0], color(255,0,0), 45, 2000],
+    [50, false, [1150,0,0], [0,14.3,0], color(0,0,255), 45, 2000],
+    [10, false, [2100,0,0], [0,5.55,0], color(0,255,0), 150, 5000],
+    [10, false, [3200,0,0], [0,4.48,0], color(255, 192, 203), 200, 5000],
+    [10, false, [4500,0,0], [0,3.75,0], color(0,255,255), 400, 8000] 
   ];
   let i = 0;
 
@@ -97,10 +100,13 @@ function makeUi(){
     i++;
   }
 
+  let orbitSimStepText = createP("Orbit simulation steps: ");orbitSimStepText.position(820, 740);
+  orbitSimStepInput = createInput("10000");orbitSimStepInput.size(35);orbitSimStepInput.position(970,755);
+  let orbitPointStepText = createP("Orbit point steps: ");orbitPointStepText.position(1020, 740);
+  orbitPointStepInput = createInput("10");orbitPointStepInput.size(25);orbitPointStepInput.position(1135,755);
+
   let showOrbitText = createP("Show Orbit: "); showOrbitText.position(820, 760);
-  showOrbit = createCheckbox("",false); showOrbit.position(900,776);
-  let showOrbitTip = createP("<--- takes a big hit on performance, keep it disabled when not in use");
-  showOrbitTip.position(930,760);
+  showOrbit = createCheckbox("",true); showOrbit.position(900,776);
 
   let updateChanges = createButton("Update Changes"); updateChanges.size(350);
   updateChanges.position(820, 720);
@@ -116,7 +122,7 @@ function makePlanets(){
       createVector(float(i[2][0].value()), float(i[2][1].value()), float(i[2][2].value())), //vel
       i[3].color(), //color
       float(i[4].value()), //size
-      i[5].checked() //is sun?
+      i[5].checked(), //is sun?
     ));
   }
 
@@ -124,20 +130,21 @@ function makePlanets(){
 
 }
 
-function calculateOrbits(){//goes 10k steps into the simulation from start pos, without displaying the planets. takes all the positions at each given step in the 10k steps, and then joins and displays it all in display()
-    for (let i = 0; i < 10000; i++) {
-      for (let body of bodies)
-        body.applyGravity();
-      for (let body of bodies) {
-        body.pos.add(body.vel);
-        if (!body.sun)
-          body.orbit.push(body.pos.copy());
-      }
+function calculateOrbits(){//goes simsteps into the simulation from start pos, without displaying the planets. takes all the positions at each given step in the 10k steps, and then joins and displays it all in display()
+
+  for (let i = 0; i < int(orbitSimStepInput.value()); i++) {
+    for (let body of bodies)
+      body.applyGravity();
+    for (let body of bodies) {
+      body.pos.add(body.vel);
+      if (!body.sun && (i%int(orbitPointStepInput.value())==0))
+        body.orbit.push(body.pos.copy());
     }
-    for (let body of bodies) {//reset pos and vel after orbit has been calculated
-      body.pos = body.tpos.copy();
-      body.vel = body.tvel.copy();
-    }
+  }
+  for (let body of bodies) {//reset pos and vel after orbit has been calculated
+    body.pos = body.tpos.copy();
+    body.vel = body.tvel.copy();
+  }
   
 }
 
@@ -168,7 +175,7 @@ class Body {
 
   display() {
     this.pos.add(this.vel);//apply velocity to position
-
+    if(this.mass==0)return;
     if (showOrbit.checked() && !this.sun) { 
       noFill();
       stroke(this.col);
@@ -182,12 +189,11 @@ class Body {
     push();
     noStroke();
     translate(this.pos.x, this.pos.y, this.pos.z);
-    if(this.sun){//snu glow and texture
+    if(this.sun){//sun glow and texture
       emissiveMaterial(this.col);
-      texture(sunT);
+      texture(sunT); 
     }
     else {
-      emissiveMaterial(0);
       fill(this.col);
     }
     sphere(this.size);
