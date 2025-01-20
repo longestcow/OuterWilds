@@ -108,6 +108,10 @@ function makeUi(){
   let showOrbitText = createP("Show Orbit: "); showOrbitText.position(820, 760);
   showOrbit = createCheckbox("",true); showOrbit.position(900,776);
 
+  let GText = createP("Gravitational Constant: "); GText.position(990, 0);
+  G = createInput("1");G.size(25);G.position(1149,14);
+
+
   let updateChanges = createButton("Update Changes"); updateChanges.size(350);
   updateChanges.position(820, 720);
   updateChanges.mouseClicked(makePlanets);
@@ -166,7 +170,7 @@ class Body {
       if (body !== this) {
         let sqrDist = p5.Vector.sub(body.pos, this.pos).magSq();
         let forceDir = p5.Vector.sub(body.pos, this.pos).normalize();
-        let force = p5.Vector.mult(forceDir, (G * this.mass * body.mass) / sqrDist);
+        let force = p5.Vector.mult(forceDir, (G.value() * this.mass * body.mass) / sqrDist);
 
         this.vel.add(force);
       }
